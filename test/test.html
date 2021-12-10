@@ -18,7 +18,7 @@
     <script type="module">
         import CodeEditor from '../src/CodeEditor.js'
 
-        const KEYS = ['const', 'class', 'var', 'let', 'function']
+        const KEYS = ['const ', 'class ', 'var ', 'let ', 'function ']
 
         const codeEditor = new CodeEditor(document.getElementById("code-editor"))
             .setHighlighter(code => hljs.highlight("javascript", code).value)

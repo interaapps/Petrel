@@ -26,7 +26,8 @@
     background: #212531;
     padding-right: 9px;
     border-right: 2px solid #FFFFFF11;
-    
+    min-height: 100%;
+
     padding-top: 15px;
     padding-left: 15px;
 }
