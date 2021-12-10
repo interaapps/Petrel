@@ -10,6 +10,9 @@ export default class CodeEditor {
         this.codeRightPadding = options.codeRightPadding ?? 0
         this.readonly = options.readonly ?? false
         
+        this.autoCompletionIndex = 0
+        this.autoCompletionOpened = false
+        
         this.stringKeys = ['"', "'", '`', ...(options.stringKeys ?? [])]
 
         this.closeKeys = {
@@ -93,6 +96,28 @@ export default class CodeEditor {
                         this.setCaretPosition(this.getCaretPosition()+this.tab.length-1);
                     }
                     break;
+                case "ArrowUp":
+                    if (this.autoCompletionOpened) {
+                        this.autoCompletionIndex--
+                        this.checkAutoCompletion()
+                        event.preventDefault()
+                    }
+                    break
+                case "ArrowDown":
+                    if (this.autoCompletionOpened) {
+                        this.autoCompletionIndex++
+                        this.checkAutoCompletion()
+                        event.preventDefault()
+                    }
+                    break
+                case "Enter":
+                    if (this.autoCompletionOpened) {
+                        this.autoCompletionElement.childNodes[this.autoCompletionIndex].click()
+                        this.checkAutoCompletion()
+                        event.preventDefault()
+                        return;
+                    }
+                    break
                 }
             }
 
@@ -207,6 +232,10 @@ export default class CodeEditor {
             
             lastWord = key+lastWord
         }
+        if (this.lastWord != lastWord){
+            this.autoCompletionIndex = 0
+            this.lastWord = lastWord
+        }
         var selection = window.getSelection()
         var range = selection.getRangeAt(0)
         var rect = range.getClientRects()[0]
@@ -215,10 +244,31 @@ export default class CodeEditor {
         
         let completionsWord = this.autoCompleteHandler(lastWord)
         this.autoCompletionElement.innerHTML = ""
-
+        
         if (completionsWord.length > 0) { //petrel-code-editor-autocompletion
+            // Get caret position
+            const { offsetLeft: inputX, offsetTop: inputY } = this.textAreaElement
+            const div = document.createElement('div')
+            const copyStyle = getComputedStyle(this.textAreaElement)
+            for (const prop of copyStyle) 
+                div.style[prop] = copyStyle[prop]
+            const inputValue = this.textAreaElement.value
+            const textContent = inputValue.substr(0, this.textAreaElement.selectionEnd)
+            div.textContent = textContent
+            const span = document.createElement('span')
+            span.textContent = inputValue.substr(this.textAreaElement.selectionEnd) || '.'
+            div.appendChild(span)
+            document.body.appendChild(div)
+
+            this.autoCompletionOpened = true
             this.autoCompletionElement.style.display = "block"
+
+            this.autoCompletionElement.style.top = inputX + span.offsetTop+24+"px"
+            this.autoCompletionElement.style.left = inputY + span.offsetLeft+"px"
+
+            document.body.removeChild(div)
             
+            let i = 0
             for (const completion of completionsWord) {
                 const el = document.createElement("a")
                 el.innerText = completion.text
@@ -231,6 +281,9 @@ export default class CodeEditor {
                     this.checkAutoCompletion()
                 })
                 this.autoCompletionElement.appendChild(el)
+                if (this.autoCompletionIndex == i)
+                    el.classList.add("selected")
+                i++
             }
         } else {
             this.closeAutocompletion()
@@ -239,6 +292,7 @@ export default class CodeEditor {
 
     closeAutocompletion(){
         this.autoCompletionElement.style.display = "none"
+        this.autoCompletionOpened = false
     }
 
     emit(event, ...values){}

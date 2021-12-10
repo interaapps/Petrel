@@ -61,6 +61,7 @@
     padding-right: 5px;
     text-align: right;
     z-index: 10;
+    background: #FFF;
 }
 
 .petrel-code-editor .petrel-code-editor-line-numbering span {
@@ -69,12 +70,12 @@
 
 
 .petrel-code-editor .petrel-code-editor-line-numbering span div {
-    height: 30px;
+    height: 22px;
     width: 100%;
     left: 0px;
     position: absolute;
     background: #FFFFFF11;
-    margin-top: -5px;
+    margin-top: -1px;
 }
 
 .petrel-code-editor .petrel-code-editor-autocompletion {
@@ -85,10 +86,15 @@
     top: 22px;
     position: absolute;
     left: 92px;
+    background: #FFF;
 }
 
 
 .petrel-code-editor .petrel-code-editor-autocompletion a {
     cursor: pointer;
     display: block;
+}
+
+.petrel-code-editor .petrel-code-editor-autocompletion a.selected {
+    background: #00000022;
 }

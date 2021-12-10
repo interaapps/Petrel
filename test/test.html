@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="../css/highlight/pastefy.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
 
-    <link rel="stylesheet" href="../css/dark.css">
+    <link rel="stylesheet" href="../css/light.css">
 </head>
 <body style="height: 100%;">
     <div style="max-width: 900px; margin: auto; padding-top: 20px;">
         <h1>Petrel Code Editor</h1>
-        <div id="code-editor" style="width: 100%"></div>
+        <div id="code-editor" style="min-height: 400px; width: 100%"></div>
     </div>
     <script type="module">
         import CodeEditor from '../src/CodeEditor.js'
@@ -27,8 +27,10 @@
 const codeEditor = new CodeEditor(document.getElementById("code-editor"))
     .setHighlighter(code => hljs.highlight("javascript", code).value)
     .setValue("console.log('Hello World!')")
-    .create()`    )
-            /*.setAutoCompleteHandler(word => {
+    .create()
+
+`    )
+            .setAutoCompleteHandler(word => {
                 const ret = []
                 if (word == "")
                     return []
@@ -49,7 +51,7 @@ const codeEditor = new CodeEditor(document.getElementById("code-editor"))
                         cursorMove: -1
                     })
                 return ret
-            })*/
+            })
             .create()
     </script>
 </body>

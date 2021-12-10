@@ -3,7 +3,7 @@
 
 # Installation
 ## NPM
-```
+```js
 npm install petrel
 
 import { CodeEditor } from 'petrel'
