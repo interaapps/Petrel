@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/highlight/pastefy.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+
+    <link rel="stylesheet" href="../css/dark.css">
+</head>
+<body style="height: 100%;">
+    <div style="max-width: 900px; margin: auto; padding-top: 20px;">
+        <h1>Petrel Code Editor</h1>
+        <div id="code-editor" style="width: 100%"></div>
+    </div>
+    <script type="module">
+        import CodeEditor from '../src/CodeEditor.js'
+
+        const KEYS = ['const', 'class', 'var', 'let', 'function']
+
+        const codeEditor = new CodeEditor(document.getElementById("code-editor"))
+            .setHighlighter(code => hljs.highlight("javascript", code).value)
+            .setValue(
+                `// Creating A Code Editor (Using highlight.js for highlighting)
+const codeEditor = new CodeEditor(document.getElementById("code-editor"))
+    .setHighlighter(code => hljs.highlight("javascript", code).value)
+    .setValue("console.log('Hello World!')")
+    .create()`    )
+            /*.setAutoCompleteHandler(word => {
+                const ret = []
+                if (word == "")
+                    return []
+                for (const key of KEYS) {
+                    if (key.toLowerCase().startsWith(word.toLowerCase()) && word !== key){
+                        ret.push({
+                            text: key,
+                            type: 'KEYWORD',
+                            replace: ()=> key 
+                        })
+                    }
+                }
+                if ('console.log'.toLowerCase().startsWith(word.toLowerCase()) || 'log'.toLowerCase().startsWith(word.toLowerCase()))
+                    ret.push({
+                        text: "console.log(...)",
+                        type: 'SHORTCUT',
+                        replace: ()=> 'console.log()',
+                        cursorMove: -1
+                    })
+                return ret
+            })*/
+            .create()
+    </script>
+</body>
+</html>
