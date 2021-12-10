@@ -224,7 +224,7 @@ export default class CodeEditor {
             return;
         const val = this.value
         let lastWord = ""
-        for (let i = this.getCaretPosition()-1; i > 0; i--) {
+        for (let i = this.getCaretPosition()-1; i > -1; i--) {
             const key = val[i]
             if (key == "\n" || key == " ") {
                 break;
@@ -232,6 +232,7 @@ export default class CodeEditor {
             
             lastWord = key+lastWord
         }
+
         if (this.lastWord != lastWord){
             this.autoCompletionIndex = 0
             this.lastWord = lastWord
