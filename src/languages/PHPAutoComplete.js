@@ -8,14 +8,12 @@ export default class PHPAutoComplete extends AutoCompletion {
             ...PHPAutoComplete.DEFAULT_FUNCTIONS,
             ...(environment.variables ? environment.variables : [])
         ]
-        console.log("TEST");
-        console.log(this.defaultVariables);
     }
 
     autoComplete(word, editor){
         const searchWord = word.replaceAll(/\(|{|;/g, "")
         const ret = []
-        if (word == "")
+        if (searchWord == "")
             return []
 
         const variables = [...this.defaultVariables]
