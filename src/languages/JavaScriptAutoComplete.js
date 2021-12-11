@@ -11,7 +11,7 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
     }
 
     autoComplete(word, editor){
-        const searchWord = searchWord.replaceAll(/\(|{|;/g, "")
+        const searchWord = word.replaceAll(/\(|{|;/g, "")
         const ret = []
         if (word == "")
             return []
