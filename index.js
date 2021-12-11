@@ -1,7 +1,7 @@
 import CodeEditor from "./src/CodeEditor.js";
 import AutoCompletion from "./src/AutoCompletion.js";
-import JavaScriptAutoComplete from "./src/JavaScriptAutoComplete.js";
-import PHPAutoComplete from "./src/PHPAutoComplete.js";
+import JavaScriptAutoComplete from "./src/languages/JavaScriptAutoComplete.js";
+import PHPAutoComplete from "./src/languages/PHPAutoComplete.js";
 
 
 
