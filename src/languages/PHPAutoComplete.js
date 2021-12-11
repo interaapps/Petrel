@@ -13,6 +13,7 @@ export default class PHPAutoComplete extends AutoCompletion {
     }
 
     autoComplete(word, editor){
+        const searchWord = word.replaceAll(/\(|{|;/g, "")
         const ret = []
         if (word == "")
             return []
@@ -29,7 +30,7 @@ export default class PHPAutoComplete extends AutoCompletion {
             variables.push(varRes[5])
         
         for (const key of PHPAutoComplete.KEYWORDS) {
-            if (key.toLowerCase().startsWith(word.toLowerCase()) && word !== key){
+            if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({
                     text: key,
                     type: 'KEYWORD',
@@ -39,7 +40,7 @@ export default class PHPAutoComplete extends AutoCompletion {
         }
         
         for (const key in PHPAutoComplete.KEYWORDS_OWN_LOGIC) {
-            if (key.toLowerCase().startsWith(word.toLowerCase()) && word !== key){
+            if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({
                     text: key,
                     type: 'KEYWORD',
@@ -50,7 +51,7 @@ export default class PHPAutoComplete extends AutoCompletion {
         }
 
         variables.forEach(key => {
-            if (key.toLowerCase().startsWith(word.toLowerCase()) && word !== key){
+            if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({
                     text: key,
                     type: 'VARIABLE',

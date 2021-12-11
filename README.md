@@ -10,11 +10,11 @@ import { CodeEditor } from 'petrel'
 ```
 ## Module
 ```js
-import CodeEditor from 'https://js.intera.dev/petrel/1.0.0/CodeEditor.js'
+import { CodeEditor } from 'https://js.intera.dev/petrel/1.0.1/index.js'
 ```
 ## JS
 ```html
-<script src='https://js.intera.dev/petrel/1.0.0.js'></script>
+<script src='https://js.intera.dev/petrel/1.0.1.js'></script>
 ```
 # Styles
 ## NPM & Webpack
@@ -23,20 +23,20 @@ require('petrel/css/dark.css')
 ```
 ## Web
 ```html
-<link rel="stylesheet" href="https://js.intera.dev/petrel/1.0.0/css/dark.css">
+<link rel="stylesheet" href="https://js.intera.dev/petrel/1.0.1/css/dark.css">
 ```
 # Example
 ```html
 
 <head>
-    <link rel="stylesheet" href="https://js.intera.dev/petrel/1.0.0/css/dark.css">
+    <link rel="stylesheet" href="https://js.intera.dev/petrel/1.0.1/css/dark.css">
     <!-- For the following example I'm using highlightjs so I import the styles for it as well. Theme: Pastefy -->
-    <link rel="stylesheet" href="https://js.intera.dev/petrel/1.0.0/css/highlight/pastefy.css">
+    <link rel="stylesheet" href="https://js.intera.dev/petrel/1.0.1/css/highlight/pastefy.css">
 </head>
 
 <div id="editor"></div>
 <script type="module">
-    import CodeEditor from 'https://js.intera.dev/petrel/1.0.0/CodeEditor.js'
+    import { CodeEditor, JavaScriptAutoComplete } from 'https://js.intera.dev/petrel/1.0.1/index.js'
 
     const codeEditor = new CodeEditor(element)
 
@@ -45,6 +45,9 @@ require('petrel/css/dark.css')
 
     // Sets the content of the editor
     codeEditor.setValue(`console.log("Welcome to Petrel!")`)
+
+    // Using JS autocompletion
+    codeEditor.setAutoCompleteHandler(new JavaScriptAutoComplete())
 
     // Creates the editor
     codeEditor.create()

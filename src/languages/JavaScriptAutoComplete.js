@@ -11,6 +11,7 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
     }
 
     autoComplete(word, editor){
+        const searchWord = searchWord.replaceAll(/\(|{|;/g, "")
         const ret = []
         if (word == "")
             return []
@@ -27,7 +28,7 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
             variables.push(varRes[5])
         
         for (const key of JavaScriptAutoComplete.KEYWORDS) {
-            if (key.toLowerCase().startsWith(word.toLowerCase()) && word !== key){
+            if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({
                     text: key,
                     type: 'KEYWORD',
@@ -37,7 +38,7 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
         }
         
         for (const key in JavaScriptAutoComplete.KEYWORDS_OWN_LOGIC) {
-            if (key.toLowerCase().startsWith(word.toLowerCase()) && word !== key){
+            if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({
                     text: key,
                     type: 'KEYWORD',
@@ -48,7 +49,7 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
         }
 
         variables.forEach(key => {
-            if (key.toLowerCase().startsWith(word.toLowerCase()) && word !== key){
+            if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({
                     text: key,
                     type: 'VARIABLE',
