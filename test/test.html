@@ -17,6 +17,8 @@
     </div>
     <script type="module">
         import CodeEditor from '../src/CodeEditor.js'
+        import JavaScriptAutoComplete from '../src/languages/JavaScriptAutoComplete.js'
+        import PHPAutoComplete from '../src/languages/PHPAutoComplete.js'
 
         const KEYS = ['const ', 'class ', 'var ', 'let ', 'function ']
 
@@ -30,28 +32,7 @@ const codeEditor = new CodeEditor(document.getElementById("code-editor"))
     .create()
 
 `    )
-            .setAutoCompleteHandler(word => {
-                const ret = []
-                if (word == "")
-                    return []
-                for (const key of KEYS) {
-                    if (key.toLowerCase().startsWith(word.toLowerCase()) && word !== key){
-                        ret.push({
-                            text: key,
-                            type: 'KEYWORD',
-                            replace: ()=> key 
-                        })
-                    }
-                }
-                if ('console.log'.toLowerCase().startsWith(word.toLowerCase()) || 'log'.toLowerCase().startsWith(word.toLowerCase()))
-                    ret.push({
-                        text: "console.log(...)",
-                        type: 'SHORTCUT',
-                        replace: ()=> 'console.log()',
-                        cursorMove: -1
-                    })
-                return ret
-            })
+            .setAutoCompleteHandler(new PHPAutoComplete())
             .create()
     </script>
 </body>

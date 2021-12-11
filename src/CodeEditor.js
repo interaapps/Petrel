@@ -1,3 +1,4 @@
+import AutoCompletion from "./AutoCompletion.js"
 
 export default class CodeEditor {
     
@@ -5,15 +6,15 @@ export default class CodeEditor {
         this.parentElement = parentElement
         this.initElements()
         this.tab = options.tabSize ? new Array(options.tabSize).join(" ") : "    "
-        this.tabShortcutsEnabled = options.tabShortcutsEnabled ?? true
-        this.placeholder = options.placeholder ?? ""
-        this.codeRightPadding = options.codeRightPadding ?? 0
-        this.readonly = options.readonly ?? false
+        this.tabShortcutsEnabled = options.tabShortcutsEnabled ? options.tabShortcutsEnabled : true
+        this.placeholder = options.placeholder ? options.placeholder : ""
+        this.codeRightPadding = options.codeRightPadding ? options.codeRightPadding : 0
+        this.readonly = options.readonly ? options.readonly : false
         
         this.autoCompletionIndex = 0
         this.autoCompletionOpened = false
         
-        this.stringKeys = ['"', "'", '`', ...(options.stringKeys ?? [])]
+        this.stringKeys = ['"', "'", '`', ...(options.stringKeys ? options.stringKeys : [])]
 
         this.closeKeys = {
             '{': '}',
@@ -22,14 +23,14 @@ export default class CodeEditor {
             '"': '"',
             "'": "'",
             '`': '`',
-            ...(options.closeKeys ?? {})
+            ...(options.closeKeys ? options.closeKeys : {})
         }
 
-        this.newLineTabs = [':', ': ', ...(options.newLineTabs ?? [])]
+        this.newLineTabs = [':', ': ', ...(options.newLineTabs ? options.newLineTabs : [])]
 
-        this.value = options.value ?? ""
+        this.value = options.value ? options.value : ""
 
-        this.autoCompleteHandler = options.autoCompleteHandler ?? null
+        this.autoCompleteHandler = options.autoCompleteHandler ? options.autoCompleteHandler : null
 
         this.highlighter = v=>v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;")
     }
@@ -49,7 +50,7 @@ export default class CodeEditor {
         this.textAreaElement.setAttribute("contenteditable", "on")
         this.textAreaElement.setAttribute("spellcheck", "false")
         this.textAreaElement.setAttribute("wrap", "off")
-        this.textAreaElement.setAttribute("placeholder", this.placeholder??'')
+        this.textAreaElement.setAttribute("placeholder", this.placeholder ? this.placeholder :'')
         this.textAreaElement.addEventListener("input", ()=>{
             this.update()
         })
@@ -60,23 +61,34 @@ export default class CodeEditor {
             }
             const caretPos = this.getCaretPosition()
             const oldValue = this.value
+            
             if (this.tabShortcutsEnabled){
             switch (event.key) { 
                 case "Tab":
-                    if (event.shiftKey) {
-                        if (!this.hasSelection() && this.value.substring(this.getCaretPosition() - this.tab.length, this.getCaretPosition()) == this.tab) {
-                            const newCaretPosition = this.getCaretPosition() - 4;
-                            this.value = this.value.substring(0, this.getCaretPosition() - 4) + this.value.substring(this.getCaretPosition(), this.value.length);
-                            this.setCaretPosition(newCaretPosition);
+                    if (!this.autoCompletionOpened){
+                        if (event.shiftKey) {
+                            if (!this.hasSelection() && this.value.substring(this.getCaretPosition() - this.tab.length, this.getCaretPosition()) == this.tab) {
+                                const newCaretPosition = this.getCaretPosition() - 4;
+                                this.value = this.value.substring(0, this.getCaretPosition() - 4) + this.value.substring(this.getCaretPosition(), this.value.length);
+                                this.setCaretPosition(newCaretPosition);
+                            }
+                        } else {    
+                            const newCaretPos = caretPos+this.tab.length
+                            this.value = this.value.substring(0, this.getCaretPosition()) + this.tab + this.value.substring(this.getCaretPosition(), this.value.length)
+                            this.setCaretPosition(newCaretPos)
+                            this.emit("tab")
                         }
-                    } else {    
-                        const newCaretPos = caretPos+this.tab.length
-                        this.value = this.value.substring(0, this.getCaretPosition()) + this.tab + this.value.substring(this.getCaretPosition(), this.value.length)
-                        this.setCaretPosition(newCaretPos)
-                        this.emit("tab")
+                        event.preventDefault()
+                        break;
                     }
-                    event.preventDefault()
-                    break;
+                case "Enter":
+                    if (this.autoCompletionOpened) {
+                        this.autoCompletionElement.childNodes[this.autoCompletionIndex].click()
+                        this.checkAutoCompletion()
+                        event.preventDefault()
+                        return;
+                    }
+                    break
                 case "Backspace":
                     if (!this.hasSelection() && this.value.substring(this.getCaretPosition() - this.tab.length, this.getCaretPosition()) == this.tab) {
                         const newCaretPosition = this.getCaretPosition() - 3;
@@ -108,14 +120,6 @@ export default class CodeEditor {
                         this.autoCompletionIndex++
                         this.checkAutoCompletion()
                         event.preventDefault()
-                    }
-                    break
-                case "Enter":
-                    if (this.autoCompletionOpened) {
-                        this.autoCompletionElement.childNodes[this.autoCompletionIndex].click()
-                        this.checkAutoCompletion()
-                        event.preventDefault()
-                        return;
                     }
                     break
                 }
@@ -212,7 +216,12 @@ export default class CodeEditor {
             this.updateLineNumbering()
             this.checkAutoCompletion()
         }
-        this.textAreaElement.addEventListener("keyup", e)
+        this.textAreaElement.addEventListener("keyup", ev=>{
+            if (ev.key == "Escape")
+                this.closeAutocompletion()
+            if (!ev.shiftKey && !["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "Escape"].includes(ev.key))
+                e()
+        })
         this.textAreaElement.addEventListener("click", ()=>{
             e()
             this.closeAutocompletion()
@@ -237,13 +246,15 @@ export default class CodeEditor {
             this.autoCompletionIndex = 0
             this.lastWord = lastWord
         }
-        var selection = window.getSelection()
-        var range = selection.getRangeAt(0)
-        var rect = range.getClientRects()[0]
-
-        console.log(rect);
         
-        let completionsWord = this.autoCompleteHandler(lastWord)
+        let completionsWord;
+
+        if (typeof completionsWord == 'function') {
+            completionsWord = this.autoCompleteHandler(lastWord, this)
+        } else /*if (completionsWord instanceof AutoCompletion)*/ {
+            completionsWord = this.autoCompleteHandler.autoComplete(lastWord, this)
+        }
+
         this.autoCompletionElement.innerHTML = ""
         
         if (completionsWord.length > 0) { //petrel-code-editor-autocompletion

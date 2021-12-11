@@ -54,6 +54,9 @@
     border-radius: 10px;
     backdrop-filter: blur(7px);
     border: 2px solid #00000055;
+
+    max-height: 150px;
+    overflow: auto;
 }
 .petrel-code-editor .petrel-code-editor-autocompletion a {
     padding: 4px 6px;
