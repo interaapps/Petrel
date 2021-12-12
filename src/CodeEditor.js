@@ -10,7 +10,7 @@ export default class CodeEditor {
         this.placeholder = options.placeholder ? options.placeholder : ""
         this.codeRightPadding = options.codeRightPadding ? options.codeRightPadding : 0
         this.readonly = options.readonly ? options.readonly : false
-        
+        this.leftLineNumPadding = 0
         this.autoCompletionIndex = 0
         this.autoCompletionOpened = false
         
@@ -109,14 +109,14 @@ export default class CodeEditor {
                     }
                     break;
                 case "ArrowUp":
-                    if (this.autoCompletionOpened) {
+                    if (this.autoCompletionOpened && !event.shiftKey) {
                         this.autoCompletionIndex--
                         this.checkAutoCompletion()
                         event.preventDefault()
                     }
                     break
                 case "ArrowDown":
-                    if (this.autoCompletionOpened) {
+                    if (this.autoCompletionOpened && !event.shiftKey) {
                         this.autoCompletionIndex++
                         this.checkAutoCompletion()
                         event.preventDefault()
@@ -148,23 +148,31 @@ export default class CodeEditor {
                         this.setCaretPosition(caretPos-1)
                         break
                     }
-                    
                     if (event.key == key) {
+                        const allowedKeys = ["\n", " ", ...Object.values(this.closeKeys)]
                         if (this.hasSelection()) {
                             const newCaret = caretPos+this.value.substring(this.textAreaElement.selectionStart, this.textAreaElement.selectionEnd).length
                             const oldStart = this.textAreaElement.selectionStart
                             const oldEnd = this.textAreaElement.selectionEnd
                             this.value = this.value.substring(0, this.textAreaElement.selectionStart)+key+this.value.substring(this.textAreaElement.selectionStart, this.textAreaElement.selectionEnd)+this.closeKeys[key]+this.value.substring(this.textAreaElement.selectionEnd, this.value.length)
                             
+                            
                             this.setCaretPosition(newCaret+1);
-                            this.select()
+                            this.textAreaElement.select()
                             this.textAreaElement.selectionStart = oldStart+1
                             this.textAreaElement.selectionEnd = oldEnd+1
+                            event.preventDefault()
+                            this.update()
+                            return;
                         } else {
-                            this.value = this.value.substring(0, caretPos)+key+this.closeKeys[key]+this.value.substring(caretPos, this.value.length)
-                            this.setCaretPosition(caretPos+1);
+                            if (!(this.value.length > caretPos && !allowedKeys.includes(this.value[caretPos]))) {
+                                this.value = this.value.substring(0, caretPos)+key+this.closeKeys[key]+this.value.substring(caretPos, this.value.length)
+                                this.setCaretPosition(caretPos+1);
+                                event.preventDefault()
+                                this.update()
+                                return;
+                            }
                         }
-                        event.preventDefault()
                     }
                 }
 
@@ -275,8 +283,8 @@ export default class CodeEditor {
             this.autoCompletionOpened = true
             this.autoCompletionElement.style.display = "block"
 
-            this.autoCompletionElement.style.top = inputX + span.offsetTop+24+"px"
-            this.autoCompletionElement.style.left = inputY + span.offsetLeft+"px"
+            this.autoCompletionElement.style.top = inputX + span.offsetTop-20+"px"
+            this.autoCompletionElement.style.left = inputY + span.offsetLeft+this.leftLineNumPadding+5+"px"
 
             document.body.removeChild(div)
             
@@ -284,6 +292,14 @@ export default class CodeEditor {
             for (const completion of completionsWord) {
                 const el = document.createElement("a")
                 el.innerText = completion.text
+
+                if (completion.type){
+                    const spanEl = document.createElement("span")
+                    spanEl.innerText = completion.type
+                    spanEl.classList.add("type-"+completion.type.toLowerCase())
+                    el.appendChild(spanEl)
+                }
+
                 el.addEventListener("click", () => {
                     const caretPos = this.getCaretPosition()
                     const val = completion.replace()
@@ -347,14 +363,14 @@ export default class CodeEditor {
         this.codePreElement.innerHTML = this.highlighter(this.value)
         
         const leftPadding = (this.lineNumberingDisabled ? 0 : this.lineNumerationsElement.offsetWidth)+this.codeRightPadding
-
-        this.textAreaElement.style.paddingLeft = leftPadding+'px'
-        this.codePreElement.style.paddingLeft  = leftPadding+'px'
+        this.leftLineNumPadding = leftPadding
+        this.textAreaElement.style.marginLeft = leftPadding+'px'
+        this.codePreElement.style.marginLeft  = leftPadding+'px'
 
         this.textAreaElement.style.height = '0px'
         this.textAreaElement.style.height = this.textAreaElement.scrollHeight+'px'
         this.textAreaElement.style.width = '0px'
-        this.textAreaElement.style.width = this.textAreaElement.scrollWidth-leftPadding+'px'
+        this.textAreaElement.style.width = this.textAreaElement.scrollWidth+'px'
     }
 
     create(){
@@ -381,6 +397,7 @@ export default class CodeEditor {
 
     setValue(val){
         this.value = val
+        this.update()
         return this
     }
 

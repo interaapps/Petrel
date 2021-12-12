@@ -4,9 +4,16 @@ export default class PHPAutoComplete extends AutoCompletion {
 
     constructor(environment = {}){
         super()
-        this.defaultVariables = [
-            ...PHPAutoComplete.DEFAULT_FUNCTIONS,
-            ...(environment.variables ? environment.variables : [])
+        this.prependSource = environment.prependSource ? environment.prependSource+"\n\n" : ''
+        this.defaultVariables = environment.variables ? environment.variables : []
+
+        this.defaultFunctions = [
+            ...PHPAutoComplete.DEFAULT_FUNCTIONS.map(fn=>({
+                name: fn,
+                paramsLength: 0,
+                params: []
+            })),
+            ...(environment.functions ? environment.functions : [])
         ]
     }
 
@@ -17,15 +24,25 @@ export default class PHPAutoComplete extends AutoCompletion {
             return []
 
         const variables = [...this.defaultVariables]
-        const val = editor.value
+        const functions = [...this.defaultFunctions]
+
+        const val = this.prependSource+editor.value
         for (const varRes of val.matchAll(/(^|;(\s*)|^([{()}])?(\s*)|\n)\$([^\$ ()/*#-,.]*)(\s*?)(=|;|\n|$)/gm))
             variables.push('$'+varRes[5])
         
         for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(class) (\s*?)([A-Za-z0-9]*)(\s*?)((extends|implements) (\s*?)[A-Za-z0-9]*)?(\s*?)({|\n|$)/gm))
             variables.push(varRes[5])
 
-        for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(function) (\s*?)([A-Za-z0-9]*)(\s*?)((\s*?)(\([^(]*)\))(\s*?){/gm))
-            variables.push(varRes[5])
+        for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(function) (\s*?)([A-Za-z0-9]*)(\s*?)((\s*?)(\(([^(]*))\))(\s*?){/gm)){
+            let params = varRes[10].split(",").map(a=>a.trim())
+            if (params[0] == '')
+                params = []
+            functions.push({
+                params: params,
+                paramsLength: params.length,
+                name: varRes[5]
+            })
+        }
         
         for (const key of PHPAutoComplete.KEYWORDS) {
             if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
@@ -41,7 +58,7 @@ export default class PHPAutoComplete extends AutoCompletion {
             if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({
                     text: key,
-                    type: 'KEYWORD',
+                    type: 'SHORTCUT',
                     replace: ()=> key,
                     ...PHPAutoComplete.KEYWORDS_OWN_LOGIC[key](key)
                 })
@@ -54,6 +71,16 @@ export default class PHPAutoComplete extends AutoCompletion {
                     text: key,
                     type: 'VARIABLE',
                     replace: ()=> key
+                })
+            }
+        })
+        functions.forEach(fn => {
+            if (fn.name.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== fn.name){
+                ret.push({
+                    text: fn.name,
+                    type: 'FUNCTION',
+                    replace: ()=> fn.name+"("+(fn.paramsLength > 0 ? fn.params.join(", ") : '')+")",
+                    cursorMove: fn.paramsLength > 0 ? -1 : 0
                 })
             }
         })

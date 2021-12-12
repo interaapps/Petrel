@@ -4,30 +4,55 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
 
     constructor(environment = {}){
         super()
-        this.defaultVariables = [
-            ...Object.keys(window),
-            ...(environment.variables ? environment.variables : [])
-        ]
+        this.defaultFunctions = environment.variables ? environment.functions : []
+        this.defaultVariables = environment.variables ? environment.variables : []
+        this.prependSource = environment.prependSource ? environment.prependSource+"\n\n" : ''
+
+        if (!environment.disableAutoLoad){
+            for (const name in window) {
+                const val = window[name]
+                if (typeof val == 'function'){
+                    // let matchParams = val.toString().match(/\([^)]*\)/)
+                    // matchParams = matchParams ? matchParams[0].substring(1).substring(0,matchParams[0].length-2) : null
+                    
+                    this.defaultFunctions.push({
+                        name: name,
+                        // paramsLength: val.length,
+                        // params: matchParams ? matchParams.split(",").map(a=>a.trim()) : []
+                    })
+                } else
+                    this.defaultVariables.push(name)
+            }
+        }
     }
 
     autoComplete(word, editor){
         const searchWord = word.replaceAll(/\(|{|;/g, "")
-        console.log(JSON.stringify(searchWord));
+        
         const ret = []
         if (searchWord == "")
             return []
 
         const variables = [...this.defaultVariables]
-        const val = editor.value
+        const functions = [...this.defaultFunctions]
+
+        const val = this.prependSource+editor.value
         for (const varRes of val.matchAll(/(^| |\n)(const|let|var) (\s*?)([A-Za-z0-9]*)(\s*?)(=|;|\n|$)/gm))
             variables.push(varRes[4])
         
         for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(class) (\s*?)([A-Za-z0-9]*)(\s*?)(extends (\s*?)[A-Za-z0-9]*)?(\s*?)({|\n|$)/gm))
             variables.push(varRes[5])
 
-        for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(function) (\s*?)([A-Za-z0-9]*)(\s*?)((\s*?)(\([^(]*)\))(\s*?){/gm))
-            variables.push(varRes[5])
-        
+        for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(function) (\s*?)([A-Za-z0-9]*)(\s*?)((\s*?)(\(([^(]*))\))(\s*?){/gm)){
+            let params = varRes[10].split(",").map(a=>a.trim())
+            if (params[0] == '')
+                params = []
+            functions.push({
+                params: params,
+                paramsLength: params.length,
+                name: varRes[5]
+            })
+        }
         for (const key of JavaScriptAutoComplete.KEYWORDS) {
             if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({
@@ -43,7 +68,7 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
                 ret.push({
                     text: key,
                     type: 'KEYWORD',
-                    replace: ()=> key+" ",
+                    replace: ()=> key,
                     ...JavaScriptAutoComplete.KEYWORDS_OWN_LOGIC[key](key)
                 })
             }
@@ -58,6 +83,16 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
                 })
             }
         })
+        functions.forEach(fn => {
+            if (fn.name.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== fn.name){
+                ret.push({
+                    text: fn.name,
+                    type: 'FUNCTION',
+                    replace: ()=> fn.name+"("+(fn.paramsLength > 0 ? fn.params.join(", ") : '')+")",
+                    cursorMove: fn.paramsLength > 0 ? -1 : 0
+                })
+            }
+        })
         return ret
     }
     
@@ -65,28 +100,29 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
 JavaScriptAutoComplete.KEYWORDS_OWN_LOGIC = {
     'function () {\n    \n}': key=>({
         text: "function",
-        replace: ()=>key,
-        cursorMove: -11
+        cursorMove: -11,
+        type: "SHORTCUT"
     }),
     'if () {\n    \n}': key=>({
         text: "if",
         replace: ()=>key,
-        cursorMove: -10
+        cursorMove: -10,
+        type: "SHORTCUT"
     }),
     'else if () {\n    \n}': key=>({
         text: "else if",
-        replace: ()=>key,
-        cursorMove: -10
+        cursorMove: -10,
+        type: "SHORTCUT"
     }),
     'else {\n    \n}': key=>({
         text: "else",
-        replace: ()=>key,
-        cursorMove: -3
+        cursorMove: -3,
+        type: "SHORTCUT"
     }),
     'console.log()': key=>({
         text: "console.log(...)",
-        replace: ()=>key,
-        cursorMove: -1
+        cursorMove: -1,
+        type: "SHORTCUT"
     })
 }
 

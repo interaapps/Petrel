@@ -22,7 +22,7 @@
     top:  15px;
 }
 
-.petrel-code-editor-line-numbering {
+.petrel-code-editor .petrel-code-editor-line-numbering {
     background: #212531;
     padding-right: 9px;
     border-right: 2px solid #FFFFFF11;
