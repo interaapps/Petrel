@@ -17,16 +17,11 @@ export default class PHPAutoComplete extends AutoCompletion {
         ]
     }
 
-    autoComplete(word, editor){
-        const searchWord = word.replaceAll(/\(|{|;/g, "")
-        const ret = []
-        if (searchWord == "")
-            return []
-
+    analyseCode(value){
         const variables = [...this.defaultVariables]
         const functions = [...this.defaultFunctions]
 
-        const val = this.prependSource+editor.value
+        const val = this.prependSource+value
         for (const varRes of val.matchAll(/(^|;(\s*)|^([{()}])?(\s*)|\n)\$([^\$ ()/*#-,.]*)(\s*?)(=|;|\n|$)/gm))
             variables.push('$'+varRes[5])
         
@@ -43,6 +38,16 @@ export default class PHPAutoComplete extends AutoCompletion {
                 name: varRes[5]
             })
         }
+        return { variables, functions }
+    }
+
+    autoComplete(word, editor){
+        const searchWord = word.replaceAll(/\(|{|;/g, "")
+        const ret = []
+        if (searchWord == "")
+            return []
+
+        const { variables, functions } = this.analyseCode(editor.value)
         
         for (const key of PHPAutoComplete.KEYWORDS) {
             if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){

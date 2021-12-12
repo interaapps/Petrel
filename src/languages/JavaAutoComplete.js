@@ -10,20 +10,13 @@ export default class JavaAutoComplete extends AutoCompletion {
         this.prependSource = environment.prependSource ? environment.prependSource+"\n\n" : ''
     }
 
-    autoComplete(word, editor){
-        const searchWord = word.replaceAll(/\(|{|;/g, "")
-        
-        const ret = []
-        if (searchWord == "")
-            return []
-
+    analyseCode(code){
         const variables = [...this.defaultVariables]
         const functions = [...this.defaultFunctions]
         const classes = [...this.defaultClasses]
 
-        const val = this.prependSource+editor.value
+        const val = this.prependSource+code
         for (const varRes of val.matchAll(/(^| |\n)((public|private|protected) )?((native|transient|volatile|static) )?([a-zA-Z_$][a-zA-Z_$0-9]*(<[a-zA-Z_$][a-zA-Z_$0-9]*?>)?) (\s*?)([a-zA-Z_$\.][a-zA-Z_$0-9\.]*)(\s*?)(=((\s*?)[^;]*)|;|\n|$)/gm)) {
-            console.log();
             if (varRes[6] == 'import') {
                 const split = varRes[9].split(".")
                 classes.push({
@@ -42,7 +35,6 @@ export default class JavaAutoComplete extends AutoCompletion {
         }
 
         for (const varRes of val.matchAll(/(^| |\n)((public|private|protected) )?((native|transient|volatile|static) )?([a-zA-Z_$][a-zA-Z_$0-9]*(<[a-zA-Z_$][a-zA-Z_$0-9]*?>)?) (\s*?)([a-zA-Z_$][a-zA-Z_$0-9]*)(\s*?)(\s*?)(\(([a-zA-Z_$0-9 ,]*)\))|\{.*\n(|;|\n|$)/gm)){
-            console.log(varRes);
             if (typeof varRes[10] != 'undefined' && typeof varRes[13]  != 'undefined' && typeof varRes[6] != 'undefined'){
                 let params = varRes[13].split(",").map(a=>a.trim().replaceAll(/([a-zA-Z_$][a-zA-Z_$0-9]*(<.*>)?) ([a-zA-Z_$][a-zA-Z_$0-9]*)/gi, (_,g1,g2,g3)=>g3))
                 if (params[0] == '')
@@ -65,6 +57,19 @@ export default class JavaAutoComplete extends AutoCompletion {
                 })
             }
         }
+
+        return {variables, functions, classes}
+    }
+
+    autoComplete(word, editor){
+        const searchWord = word.replaceAll(/\(|{|;/g, "")
+        
+        const ret = []
+        if (searchWord == "")
+            return []
+
+        const {variables, functions, classes} = this.analyseCode(editor.value)
+        
         for (const key of JavaAutoComplete.KEYWORDS) {
             if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({
@@ -96,10 +101,8 @@ export default class JavaAutoComplete extends AutoCompletion {
             }
         })
         functions.forEach(fn => {
-            console.log(fn);
             if (fn.name.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== fn.name){
                 const fnN = fn.name+"("+(fn.paramsLength > 0 ? fn.params.join(", ") : '')+")"+(fn.type == 'void' ? ';' : '')
-                console.log(fnN);
                 ret.push({
                     text: fnN.replace(";",'')+": "+fn.type,
                     type: 'FUNCTION',

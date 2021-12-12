@@ -4,7 +4,7 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
 
     constructor(environment = {}){
         super()
-        this.defaultFunctions = environment.variables ? environment.functions : []
+        this.defaultFunctions = environment.functions ? environment.functions : []
         this.defaultVariables = environment.variables ? environment.variables : []
         this.prependSource = environment.prependSource ? environment.prependSource+"\n\n" : ''
 
@@ -26,17 +26,11 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
         }
     }
 
-    autoComplete(word, editor){
-        const searchWord = word.replaceAll(/\(|{|;/g, "")
-        
-        const ret = []
-        if (searchWord == "")
-            return []
-
+    analyseCode(value){
         const variables = [...this.defaultVariables]
         const functions = [...this.defaultFunctions]
 
-        const val = this.prependSource+editor.value
+        const val = this.prependSource+value
         for (const varRes of val.matchAll(/(^| |\n)(const|let|var) (\s*?)([A-Za-z0-9]*)(\s*?)(=|;|\n|$)/gm))
             variables.push(varRes[4])
         
@@ -53,6 +47,19 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
                 name: varRes[5]
             })
         }
+        return {variables, functions}
+    }
+
+    autoComplete(word, editor){
+        const searchWord = word.replaceAll(/\(|{|;/g, "")
+        
+        const ret = []
+        if (searchWord == "")
+            return []
+
+        const { variables, functions } = this.analyseCode(editor.value)
+
+        
         for (const key of JavaScriptAutoComplete.KEYWORDS) {
             if (key.toLowerCase().startsWith(searchWord.toLowerCase()) && searchWord !== key){
                 ret.push({

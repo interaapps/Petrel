@@ -132,8 +132,7 @@ export default class CodeEditor {
 
             if (this.closeKeys !== false){
                 for (const key in this.closeKeys) {
-                    if (event.key == this.closeKeys[key] && this.value.substring(caretPos-1, caretPos) == key
-                        && (this.stringKeys.includes(key) ? this.value.substring(caretPos-2, caretPos-1) != key : true)
+                    if (event.key == this.closeKeys[key] && this.value[caretPos-1] == key && this.value[caretPos] == this.closeKeys[key]
                     ) {
                         event.preventDefault()
                         this.setCaretPosition(caretPos+1)
@@ -191,7 +190,7 @@ export default class CodeEditor {
                                     else
                                         break
                                 }
-                            }  a;
+                            }
                         }
                         i++
                     }
