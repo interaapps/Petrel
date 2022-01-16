@@ -31,13 +31,13 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
         const functions = [...this.defaultFunctions]
 
         const val = this.prependSource+value
-        for (const varRes of val.matchAll(/(^| |\n)(const|let|var) (\s*?)([A-Za-z0-9]*)(\s*?)(=|;|\n|$)/gm))
+        for (const varRes of val.matchAll(/(^| |\n)(const|let|var) (\s*?)([A-Za-z0-9_$]*)(\s*?)(=|;|\n|$)/gm))
             variables.push(varRes[4])
         
-        for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(class) (\s*?)([A-Za-z0-9]*)(\s*?)(extends (\s*?)[A-Za-z0-9]*)?(\s*?)({|\n|$)/gm))
+        for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(class) (\s*?)([A-Za-z0-9_$]*)(\s*?)(extends (\s*?)[A-Za-z0-9]*)?(\s*?)({|\n|$)/gm))
             variables.push(varRes[5])
 
-        for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(function) (\s*?)([A-Za-z0-9]*)(\s*?)((\s*?)(\(([^(]*))\))(\s*?){/gm)){
+        for (const varRes of val.matchAll(/(^|;(\s*)?|\n)(function) (\s*?)([A-Za-z0-9_$]*)(\s*?)((\s*?)(\(([^(]*))\))(\s*?){/gm)){
             let params = varRes[10].split(",").map(a=>a.trim())
             if (params[0] == '')
                 params = []

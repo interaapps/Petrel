@@ -195,14 +195,18 @@ export default class CodeEditor {
                         i++
                     }
                     let caretInc = 0
-                    if (['{','(','['].includes(this.value.substring(caretPos-1, caretPos))){
+                    const char = this.value.substring(caretPos-1, caretPos)
+                    if (['{','(','['].includes(char) || ('>' == char && this.value.substring(caretPos, caretPos+1) == '<')){
+                        console.log("YYAAA");
                         this.value = this.value.substring(0, caretPos)+"\n"+this.tab+startingSpaces
                             // Check if the closing bracket is right after the caret. If yes, add newline
                             + (this.value.substring(caretPos, caretPos+1) == this.closeKeys[this.value.substring(caretPos-1, caretPos)] ? "\n" : '')
                             + startingSpaces
+                            // Adding new line for <
+                            + (char == '>' ? "\n" : '')
                             + this.value.substring(caretPos, this.value.length)
                         caretInc = this.tab.length+1
-                    } else if (this.newLineTabs.includes(this.value.substring(caretPos-1, caretPos))){
+                    } else if (this.newLineTabs.includes(char)){
                         this.value = this.value.substring(0, caretPos)+"\n"+this.tab+startingSpaces+this.value.substring(caretPos, this.value.length)
                         caretInc = 5
                     } else {
