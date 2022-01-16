@@ -20,14 +20,14 @@
         import JavaScriptAutoComplete from '../src/languages/JavaScriptAutoComplete.js'
         import JavaAutoComplete from '../src/languages/JavaAutoComplete.js'
         import PHPAutoComplete from '../src/languages/PHPAutoComplete.js'
-        import BashAutoComplete from '../src/languages/BashAutoComplete.js'
+        import SQLAutoComplete from '../src/languages/SQLAutoComplete.js'
 
         const codeEditor = new CodeEditor(document.getElementById("code-editor"))
             .setHighlighter(code => hljs.highlight("shell", code).value)
             .setValue(
                 `
 `    )
-            .setAutoCompleteHandler(new BashAutoComplete())
+            .setAutoCompleteHandler(new SQLAutoComplete())
             .create()
     </script>
 </body>
