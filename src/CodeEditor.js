@@ -225,18 +225,18 @@ export default class CodeEditor {
                 this.update()
             }
         })
-        const e = ()=>{
-            this.updateLineNumbering()
-            this.checkAutoCompletion()
-        }
+        
         this.textAreaElement.addEventListener("keyup", ev=>{
             if (ev.key == "Escape")
                 this.closeAutocompletion()
-            if (!ev.shiftKey && !["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "Escape"].includes(ev.key))
-                e()
+
+            this.updateLineNumbering()
+            if (!ev.shiftKey && !["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "Escape"].includes(ev.key)){
+                this.checkAutoCompletion()
+            }
         })
         this.textAreaElement.addEventListener("click", ()=>{
-            e()
+            this.updateLineNumbering()
             this.closeAutocompletion()
         })
     }
