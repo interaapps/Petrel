@@ -25,5 +25,5 @@ export default class JSONAutoComplete extends AutoCompletion {
         return ret
     }   
 }
-
+JSONAutoComplete.FILE_EXTENSIONS = ["json"]
 JSONAutoComplete.KEYWORDS = ["true", "false", "null"]

@@ -104,6 +104,7 @@ export default class JavaScriptAutoComplete extends AutoCompletion {
     }
     
 }
+JavaScriptAutoComplete.FILE_EXTENSIONS = ["js", "mjs"]
 JavaScriptAutoComplete.KEYWORDS_OWN_LOGIC = {
     'function () {\n    \n}': key=>({
         text: "function",

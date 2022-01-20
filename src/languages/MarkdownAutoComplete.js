@@ -44,5 +44,5 @@ export default class MarkdownAutoComplete extends AutoCompletion {
         return ret
     }   
 }
-
+MarkdownAutoComplete.FILE_EXTENSIONS = ["md"]
 MarkdownAutoComplete.KEYWORDS = ["## ", "### ", "#### ", "##### ", "###### ", "```", "table", "[link](url)", "![alt](image)", "****", "__"]

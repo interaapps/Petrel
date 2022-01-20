@@ -22,5 +22,6 @@ export default class DockerfileAutoComplete extends AutoCompletion {
         return ret
     }   
 }
+DockerfileAutoComplete.FILE_EXTENSIONS = ["Dockerfile"]
 
 DockerfileAutoComplete.KEYWORDS = ["RUN", "CMD", "FROM", "COPY", "MOVE", "WORKDIR", "ENTRYPOINT", "AS"]

@@ -210,6 +210,8 @@ export default class CodeEditor {
                         this.value = this.value.substring(0, caretPos)+"\n"+this.tab+startingSpaces+this.value.substring(caretPos, this.value.length)
                         caretInc = 5
                     } else {
+                        if (startingSpaces == "")
+                            return;
                         this.value = this.value.substring(0, caretPos)+"\n"+startingSpaces+this.value.substring(caretPos, this.value.length)
                         caretInc = 1
                     }

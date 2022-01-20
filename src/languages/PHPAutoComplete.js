@@ -108,6 +108,7 @@ PHPAutoComplete.KEYWORDS_OWN_LOGIC = {
     'public function () {\n    \n}': key=>({ text: "pubf", cursorMove: -11 }),
     'public static function () {\n    \n}': key=>({ text: "pubfs", cursorMove: -11 }),
 }
+PHPAutoComplete.FILE_EXTENSIONS = ["php", "php3", "php4"]
 
 PHPAutoComplete.KEYWORDS = ['<?php', '__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'default', 'do', 'echo', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'for', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private', 'protected', 'public', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor']
 

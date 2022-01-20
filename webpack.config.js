@@ -1,7 +1,7 @@
 const path = require('path');
 require("babel-polyfill")
 module.exports = {
-  entry: ['babel-polyfill', './index.js'],
+  entry: ['babel-polyfill', './full.js'],
   output: {
     filename: 'petrel.js',
     path: path.resolve(__dirname, 'dist'),

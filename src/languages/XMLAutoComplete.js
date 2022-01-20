@@ -48,6 +48,6 @@ export default class XMLAutoComplete extends AutoCompletion {
         return ret
     }   
 }
-
+XMLAutoComplete.FILE_EXTENSIONS = ["xml"]
 XMLAutoComplete.KEYWORDS = []
 XMLAutoComplete.TAGS = []

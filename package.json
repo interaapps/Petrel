@@ -1,6 +1,6 @@
 {
   "name": "petrel",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Petrel is a library to create wonderful and customizable code editors",
   "main": "index.js",
   "scripts": {

@@ -26,5 +26,5 @@ export default class YAMLAutoComplete extends AutoCompletion {
         return ret
     }   
 }
-
+YAMLAutoComplete.FILE_EXTENSIONS = ["yaml", "yml"]
 YAMLAutoComplete.KEYWORDS = ["true", "false", "no", "yes", "off", "on", "null", "none", "- ", "---"]

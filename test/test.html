@@ -16,11 +16,9 @@
         <div id="code-editor" style="min-height: 400px; width: 100%"></div>
     </div>
     <script type="module">
-        import CodeEditor from '../src/CodeEditor.js'
-        import JavaScriptAutoComplete from '../src/languages/JavaScriptAutoComplete.js'
-        import JavaAutoComplete from '../src/languages/JavaAutoComplete.js'
-        import PHPAutoComplete from '../src/languages/PHPAutoComplete.js'
-        import SQLAutoComplete from '../src/languages/SQLAutoComplete.js'
+        import { CodeEditor } from '../index.js'
+        import { SQLAutoComplete } from '../autocompletions.js'
+        
 
         const codeEditor = new CodeEditor(document.getElementById("code-editor"))
             .setHighlighter(code => hljs.highlight("shell", code).value)
